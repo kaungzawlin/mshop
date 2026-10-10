@@ -1,0 +1,60 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / editors
+.idea/
+.vscode/
+.fleet/
+.nova/
+.phpactor.json
+
+# Local env (Nuxt + Laravel)
+.env
+.env.*
+!.env.example
+.env.backup
+.env.production
+
+# Node (shop-client, shop-server)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# PHP / Laravel (shop-server)
+vendor/
+.phpunit.cache/
+.phpunit.result.cache
+auth.json
+_ide_helper.php
+Homestead.json
+Homestead.yaml
+public/build/
+public/hot/
+public/storage/
+public/fonts-manifest.dev.json
+storage/*.key
+storage/pail/
+
+# Nuxt (shop-client)
+.output/
+.data/
+.nuxt/
+.nitro/
+.cache/
+dist/
+
+# Logs
+logs/
+*.log
+
+# Optional local tooling (shop-server)
+.codex/
+.cursor/
+.claude/
+.agents/
+.grok/
+.zed/
+.mcp.json
