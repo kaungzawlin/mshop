@@ -1,75 +1,17 @@
-# Nuxt Minimal Starter
+# mshop client (`shop-client`)
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Nuxt 4 storefront + BFF for Slice A auth.
 
 ## Setup
 
-Make sure to install dependencies:
+1. `cd shop-client`
+2. `cp .env.example .env` — set `NUXT_API_BASE=http://localhost:8000`
+3. `npm install`
+4. `npm run dev` → http://localhost:3000
 
-```bash
-# npm
-npm install
+## BFF
 
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- Browser calls same-origin `/api/*` only.
+- Nitro proxies to Laravel, stores Sanctum token in httpOnly `mshop_token` cookie.
+- CSRF: `XSRF-TOKEN` cookie + `X-XSRF-TOKEN` header on mutating requests → `403 csrf_mismatch` if missing/invalid.
+- Language: `my` (default) / `en` via header toggle; logged-in users sync with `PATCH /api/me/locale`.

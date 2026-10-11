@@ -1,58 +1,65 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# mshop API (`shop-server`)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel 13 API for the mshop marketplace. Slice A: auth, roles, Neon Free Postgres.
 
-## About Laravel
+## Prerequisites
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.3+ with `pdo_pgsql`
+- Composer
+- A [Neon](https://neon.com/) Free project (this repo uses project `mshop` — Postgres 16)
+- Optional: Docker for [Mailpit](https://github.com/axllent/mailpit) (password-reset email UI)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Local setup
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. `cd shop-server`
+2. `cp .env.example .env`
+3. Paste the Neon **direct** (non-pooler) connection string into `DB_URL` for local migrations. Keep `DB_CONNECTION=pgsql` and `DB_SSLMODE=require`. (Pooled/`-pooler` URLs break DDL/migrations.)
+4. For tests: `cp .env.testing.example .env.testing`, set `DB_URL` to the **`mshop_test` branch** direct URI (never the main branch).
+5. `composer install`
+6. `php artisan key:generate`
+7. `php artisan migrate:fresh --seed` — loads Slice A role fixtures (local/testing only)
+8. `php artisan serve` → API at `http://localhost:8000`
+9. `php artisan test` (uses Neon `mshop_test` via `.env.testing`)
+10. Optional mail: `docker compose up -d` → Mailpit at `http://localhost:8025`; set `MAIL_MAILER=smtp`, `MAIL_PORT=1025`
 
-## Learning Laravel
+### Neon branches
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Branch | Use |
+|--------|-----|
+| `main` | Local/dev app data |
+| `mshop_test` | Pest / `RefreshDatabase` only |
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Never commit real `DB_URL` values. Never run tests against the main branch.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Auth settings (env)
 
-## Agentic Development
+| Key | Default | Purpose |
+|-----|---------|---------|
+| `AUTH_TOKEN_TTL_DAYS` | 30 | Sanctum token `expires_at` |
+| `AUTH_REQUIRE_EMAIL_VERIFICATION` | false | Off in MVP; register logs in immediately |
+| `AUTH_LOGIN_MAX_ATTEMPTS` / `AUTH_LOGIN_DECAY_MINUTES` | 5 / 15 | Login rate limit (EXAMPLE) |
+| `TRUSTED_PROXIES` | 127.0.0.1 | Trust Nuxt BFF `X-Forwarded-For` |
+| `FRONTEND_URL` | http://localhost:3000 | Password-reset links |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Smoke (Slice A)
+
+With `php artisan serve` running:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php scripts/smoke_slice_a.php
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Local seed users (local/testing only)
 
-## Contributing
+Password for all: `password`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| Role | Email |
+|------|-------|
+| admin | admin@example.test |
+| ops | ops@example.test |
+| finance | finance@example.test |
+| reseller | reseller@example.test |
+| rider | rider@example.test |
+| customer | customer@example.test |
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Seeder refuses to run outside `local` / `testing`.
